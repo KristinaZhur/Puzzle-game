@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="utf-8">
+    <title>index</title>
+    <script src="js.js"></script>
+    <script src="http://fe.it-academy.by/JQ/jquery.js"></script>
+    <link rel="stylesheet" href="./css/style.css" type="text/css"> 
+</head>
+<body>    
+    <script>
+      
+        const nav = document.createElement ('nav');
+        nav.setAttribute('class', "mainmenu" )
+        nav.setAttribute('id', "mainmenu" )
+        nav.innerHTML = "<ul class='mainmenu__list'><li><a class='mainmenu__link' href='#main'>Начать игру</a></li><li><a class='mainmenu__link' href='#about'>Правила игры</a></li><li><a class='mainmenu__link' href='#records'>Таблица рекордов</a></li></ul>";
+        document.body.append(nav);
+        const div = document.createElement ('div');
+            div.setAttribute('class', "content" );
+            div.setAttribute('id', "content" );
+        document.body.append (div);
+        const mySPA = (function() {
+        const ui = { // элементы верстки, учавствующие в процессе
+            navContainer: document.getElementById("mainmenu"),
+            contentContainer: document.getElementById("content"),
+        };
+
+        const HomeComponent = {
+            render: (className = "container") => {
+                return `
+                <section class="${className}">
+                  <h1>Игра мозаика</h1>
+                  <p>Приобщитесь к прекрасной мозаике, возбуждающей мозговую активность.Сделайте перерыв и сыграйте в игру, которая развивают логику и воображение, позволяет приятно отдохнуть. Расслабьтесь и отвлекитесь от дел!</p><div class=data><a  class="registr" href="registration.html" title="registration">Registration</a>
+                  <p><a  class="logIn" href="login.html" title="Log in">Log in</a></p><br></div>
+                </section><div id = 'blockcanvas'><canvas id="canvas"></canvas><div id = 'btn'>start time</div><div id = 'counttime'></div></div>`;
+            }
+        };
+
+        const AboutComponent = {
+            render: (className = "container") => {
+              return `
+                <section class="${className}">
+                  <h1>Правила игры</h1>
+                  <p>Правила игры предельно просты - тебе предстоит сложить кусочки пазла так, чтобы в итоге получилась целая картинка. Мозаика не только скрасит твое времяпрепровождение, но также поможет развить внимательность и такие полезные навыки, как логическое мышление, память и пространственное воображение.  Если ты сумел верно соединить детали друг с другом, то они срастаются. В общем, не трать время в пустую, а весело тренируй мозги! Для того, чтобы время игры было записано в таблицу, пожалуйста, пройдите регистрацию, затем войдите под свои именем и паролем.</p>
+                </section> `;
+            }
+        };
+
+        const RecordsComponent = {
+            render: (className = "container") => {
+              return `
+                <section class="${className}">
+                  
+                </section><table><tr><th>Имя</th><th>Время</th></tr><tr><td>${window.localStorage.getItem('login')}</td><td>${window.localStorage.getItem('time')}</td></tr>
+                  </table>
+              `;
+            }
+        };
+
+        const Error404Component = {
+            render: (className = "container") => {
+              return `
+                <section class="${className}">
+                  <h1>Ошибка 404</h1>
+                  <p>Страница не найдена, попробуйте вернуться на <a href="#main">главную</a>.</p>
+                </section>
+              `;
+            }
+        };
+
+        const router = {
+            main: HomeComponent,
+            about: AboutComponent,
+            records: RecordsComponent,
+            error: Error404Component
+        };
+
+        function updateState() {
+            //console.log("hash changed");   
+            const hashPageName = window.location.hash.slice(1).toLowerCase();
+            let routeName = null;
+
+            if (hashPageName.length > 0) {
+                routeName = hashPageName in router ? hashPageName : "error";
+            }
+
+            ui.contentContainer.innerHTML = router[routeName].render(`${routeName}-page`);
+            updateButtons();
+            if (hashPageName  === 'main') {
+               start();   
+            }
+        };
+
+        function updateButtons() { // пробегаемся по меню и выставляем класс active для ссылок
+            let menuLinks = ui.navContainer.querySelectorAll(".mainmenu__link");
+            const state = window.location.hash.slice(1);
+
+            for (let i = 0, menuLinksCount = menuLinks.length; i < menuLinksCount; i++) {
+                if (state === menuLinks[i].getAttribute("href").slice(1)){
+                    menuLinks[i].classList.add("active");
+                } else {
+                    menuLinks[i].classList.remove("active");
+                }
+            }
+        };
+
+            return {
+                init: function() { // вешаем слушателей на событие hashchange и кликам по пунктам меню
+                    window.addEventListener("hashchange", updateState);
+                  //вызываем первую отрисовку
+                    if (window.location.hash.slice(1)) {
+                        updateState();
+                    } else {
+                        window.location.hash = "#main";
+                    }
+                }
+            }
+        })();
+
+        document.addEventListener("DOMContentLoaded", mySPA.init()); // инициализируем модуль как только DOM готов.
+    </script>
+</body>
+</html>

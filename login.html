@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="utf-8">
+    <title>login</title>
+    <script src="http://fe.it-academy.by/JQ/jquery.js"></script>
+</head>
+<body>
+    <script>
+        var main = document.createElement ('main');
+            main.setAttribute ('id', 'modalLogin');
+            main.style.cssText = 'width: 300px; height: 300px; margin: auto; text-align: center; display: flex; justify-content: center; flex-wrap: wrap; border: solid 5 px darkgrey; border-radius: 5px';
+        document.body.append (main);
+        var error = document.createElement ('p');
+            error.setAttribute('id', 'error');
+            main.append(error);
+        var success = document.createElement ('p');
+            success.setAttribute('id', 'success');
+        //success.innerHTML='<p><a href="index.html">Back to play</a></p>';
+            main.append (success);
+        var form = document.createElement ('form');
+            main.append (form);
+            form.style.cssText = 'border: 5px gray solid; border-radius: 5px; padding: 8px 12px; margin: 0 10px; font-size: 14px';
+        var inputName = document.createElement ('input');
+            inputName.setAttribute('id', 'name');
+            inputName.required=true;
+            inputName.style.cssText = ' border: 1px gray solid; border-radius: 5px; margin: 10px; font-size: 18px';
+            inputName.placeholder = 'имя';
+        var inputPassword = document.createElement ('input');
+            inputPassword.setAttribute('id', 'password');
+            inputPassword.style.cssText = ' border: 1px gray solid; border-radius: 5px; margin: 10px; font-size: 18px';
+            inputPassword.required=true;
+
+            inputPassword.placeholder = 'пароль';
+            form.append(inputName, inputPassword);
+        var btn = document.createElement ('button');
+            btn.setAttribute('id', 'submitLogin');
+            btn.textContent = 'submit';
+            btn.style.cssText = 'display: flex; justify-content: center; text-align: center; margin: auto; background-color: #28a745; border-color: #28a745; border-radius: 5px; border: 1px gray solid; color: #fff; font-size: 20px';
+            btn.onclick= login;
+            form.append(btn);
+        var backMainPage = document.createElement ('div');
+            backMainPage.innerHTML='<p><a href="index.html">Back to play</a></p>';
+        document.body.append(backMainPage);
+            backMainPage.style.cssText = 'margin: auto; display: flex; justify-content: center; text-align: center';
+        var name;
+            async function login() {
+                btn.disabled = true;
+                name = inputName.value;
+                let password = inputPassword.value;
+
+                if (!name || !password) {
+                    error.innerHTML = "Fill All Fields";
+                    submitLogin.disabled = false;
+                    return;
+                }
+
+                let usersString = await getUsers();
+                let users = JSON.parse(usersString.result);
+                console.log(users, "users")
+
+                if (!users[name]) {
+                    console.log("no user in DB")
+                    error.innerHTML = "wrong name or password"
+                    btn.disabled = false;
+                    return;
+                } else {
+                    let user = users[name];
+                    console.log(user.password,11111111)
+                    console.log(password,2222222)
+                    console.log(user.password !== password)
+                    if (user.password != password) {
+                        error.innerHTML = "wrong name or password"
+                        btn.disabled = false;
+                        return;
+                    }
+                    error.innerHTML = "";
+                    success.innerHTML = "Success login";
+                }
+            }
+
+            function getUsers() {
+                return $.ajax({
+                    url: "https://fe.it-academy.by/AjaxStringStorage2.php", type: 'POST', cache: false, dataType: 'json',
+                    data: {f: 'READ', n: "YAKUBKINA_PUZZLE_USERS"}
+                }
+                );
+            }
+            window.localStorage.setItem("login",name);
+            //var n = window.localStorage.setItem("login",name);
+   
+    </script>
+</body>
+</html>
